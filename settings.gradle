@@ -1,0 +1,2 @@
+rootProject.name='PdfAssetViewer'
+include ':app'
