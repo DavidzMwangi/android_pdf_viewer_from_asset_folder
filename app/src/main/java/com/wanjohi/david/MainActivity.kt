@@ -26,6 +26,9 @@ class MainActivity : AppCompatActivity() {
     val FILENAME = "hte330k.pdf"
     var pdfRenderer:PdfRenderer?=null
     var position:Int=0
+    //open file in assets
+    var fileDescriptor: ParcelFileDescriptor?=null
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,8 +55,6 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-        //open file in assets
-        val fileDescriptor: ParcelFileDescriptor
 
         // Create file object to read and write on
         val file = File(applicationContext.getCacheDir(), FILENAME)
@@ -63,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         }
         fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
 
-         pdfRenderer = PdfRenderer(fileDescriptor)
+         pdfRenderer = PdfRenderer(fileDescriptor!!)
 
         openPDF(position)
 
@@ -106,7 +107,6 @@ class MainActivity : AppCompatActivity() {
         rendererPage.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
         imageView?.setImageBitmap(bitmap)
         rendererPage.close()
-//        pdfRenderer?.close()
 
     }
 
@@ -149,4 +149,14 @@ class MainActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun onStop() {
+        try{
+            pdfRenderer?.close()
+            fileDescriptor?.close()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
+        super.onStop()
+    }
 }
